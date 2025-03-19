@@ -29,6 +29,7 @@ export async function POST(req: Request) {
       .from(paragraph)
       .where(eq(paragraph.shortId, shortId));
 
+
     while (existingParagraph.length > 0) {
       shortId = generateShortId();
       existingParagraph = await db
@@ -37,7 +38,6 @@ export async function POST(req: Request) {
         .where(eq(paragraph.shortId, shortId));
     }
 
-    // Insert into the database
     await db.insert(paragraph).values({
       title,
       description,
@@ -59,10 +59,7 @@ export async function GET(req: Request) {
 
   try {
     const paragraphs = await db
-      .select()
-      .from(paragraph)
-      .limit(limit)
-      .offset(offset);
+    .query.paragraph.findMany({orderBy: (model, { desc }) => desc(model.id)})
 
     if (paragraphs.length === 0) {
       return NextResponse.json({ message: "No paragraphs found." }, { status: 404 });
