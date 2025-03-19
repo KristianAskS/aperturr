@@ -1,0 +1,76 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
+import { NextResponse } from "next/server";
+import { paragraph } from "~/server/db/schema";
+import { db } from "~/server/db";
+import { eq } from "drizzle-orm";
+
+const generateShortId = () => {
+  return Math.random().toString(36).substring(2, 8);
+};
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const { title, description, maxFines } = body;
+
+    // Basic validation
+    if (!title || !description || !maxFines) {
+      return NextResponse.json({ message: "Missing required fields." }, { status: 400 });
+    }
+
+    // Generate a unique short_id
+    let shortId = generateShortId();
+
+    // Ensure the short_id is unique in the database
+    let existingParagraph = await db
+      .select()
+      .from(paragraph)
+      .where(eq(paragraph.shortId, shortId));
+
+    while (existingParagraph.length > 0) {
+      shortId = generateShortId();
+      existingParagraph = await db
+        .select()
+        .from(paragraph)
+        .where(eq(paragraph.shortId, shortId));
+    }
+
+    // Insert into the database
+    await db.insert(paragraph).values({
+      title,
+      description,
+      maxFines,
+      shortId: shortId,
+    })
+
+    return NextResponse.json({ message: "Paragraph created successfully." }, { status: 201 });
+  } catch (error) {
+    console.error("Error creating paragraph:", error);
+    return NextResponse.json({ message: "Internal server error.", error: (error as Error).message }, { status: 500 });
+  }
+}
+
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const offset = searchParams.get("offset") ? parseInt(searchParams.get("offset") as string, 10) : 0;
+  const limit = 50;
+
+  try {
+    const paragraphs = await db
+      .select()
+      .from(paragraph)
+      .limit(limit)
+      .offset(offset);
+
+    if (paragraphs.length === 0) {
+      return NextResponse.json({ message: "No paragraphs found." }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: paragraphs }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching paragraphs:", error);
+    return NextResponse.json({ message: "Internal server error.", error: (error as Error).message }, { status: 500 });
+  }
+}

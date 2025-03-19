@@ -28,7 +28,7 @@ export const paragraph = createTable("paragraph", {
   title: varchar("title", { length: 256 }).notNull(),
   description: text("description").notNull(),
   maxFines: integer("max_fines").notNull(),
-  shortId: integer("short_id").notNull().unique(),
+  shortId: varchar("short_id", { length: 256 }).notNull().unique(),
 });
 
 // fine 
@@ -42,7 +42,6 @@ export const fine = createTable("fine", {
 
   numFines: integer("num_fines").notNull(),
 
-  // Using text for image URLs/links; this field is nullable.
   imageLink: text("image_link").notNull(),
   approved: boolean("approved").default(false).notNull(),
   reimbursed: boolean("reimbursed").default(false).notNull(),
