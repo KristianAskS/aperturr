@@ -9,7 +9,7 @@ import {
   SignedIn,
   SignedOut,
   UserButton,
-} from '@clerk/nextjs'
+} from '@clerk/nextjs';
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -22,9 +22,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
-    <html lang="en" className={`${GeistSans.variable}`}>
-      <body>
-      <header className="flex justify-end items-center p-4 gap-4 h-16">
+      <html lang="en" className={`${GeistSans.variable}`}>
+        <body suppressHydrationWarning>
+          <header className="flex justify-end items-center p-4 gap-4 h-16">
             <SignedOut>
               <SignInButton />
               <SignUpButton />
@@ -35,7 +35,7 @@ export default function RootLayout({
           </header>
           {children}
         </body>
-    </html>
+      </html>
     </ClerkProvider>
   );
 }

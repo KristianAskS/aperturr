@@ -54,4 +54,6 @@ export const fine = createTable("fine", {
     .notNull(),
 });
 
+export type ParagraphType = typeof paragraph.$inferSelect;
 
+export type ParagraphInsertType = typeof paragraph.$inferInsert;
