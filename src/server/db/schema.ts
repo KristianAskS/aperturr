@@ -1,0 +1,58 @@
+import { sql } from "drizzle-orm";
+import {
+  index,
+  integer,
+  pgTableCreator,
+  timestamp,
+  varchar,
+  text,
+  boolean,
+} from "drizzle-orm/pg-core";
+
+export const createTable = pgTableCreator((name) => `aperturr_${name}`);
+
+export const user = createTable("user", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  discordId: varchar("discord_id", { length: 256 })
+    .notNull()
+    .unique(),
+  username: varchar("username", { length: 256 }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+// paragraph table
+export const paragraph = createTable("paragraph", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  title: varchar("title", { length: 256 }).notNull(),
+  description: text("description").notNull(),
+  maxFines: integer("max_fines").notNull(),
+  shortId: integer("short_id").notNull().unique(),
+});
+
+// fine 
+export const fine = createTable("fine", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  shortId: integer("short_id").notNull().unique(),
+
+  paragraphTitle: varchar("paragraph_title", { length: 256 }).notNull(),
+  paragraphShortId: varchar("paragraph_short_id", { length: 256 }).notNull(),
+  description: text("description").notNull(),
+
+  numFines: integer("num_fines").notNull(),
+
+  // Using text for image URLs/links; this field is nullable.
+  imageLink: text("image_link").notNull(),
+  approved: boolean("approved").default(false).notNull(),
+  reimbursed: boolean("reimbursed").default(false).notNull(),
+  offenderId: varchar("offender_id", { length: 256 }).notNull(),
+  offenderName: varchar("offender_name", { length: 256 }).notNull(),
+  issuerId: varchar("issuer_id", { length: 256 }).notNull(),
+  issuerName: varchar("issuer_name", { length: 256 }).notNull(),
+  date: timestamp("date", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+
