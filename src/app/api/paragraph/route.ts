@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { paragraph } from "~/server/db/schema";
 import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
+import { auth } from "@clerk/nextjs/server";
 
 const generateShortId = () => {
   return Math.random().toString(36).substring(2, 8);
@@ -12,6 +13,11 @@ const generateShortId = () => {
 
 export async function POST(req: Request) {
   try {
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     const { title, description, maxFines } = body;
 
@@ -53,6 +59,12 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+
   const { searchParams } = new URL(req.url);
   const offset = searchParams.get("offset") ? parseInt(searchParams.get("offset") as string, 10) : 0;
   const limit = 50;
