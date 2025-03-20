@@ -1,4 +1,5 @@
 import "~/styles/globals.css";
+import { ThemeProvider } from "~/components/theme-provider";
 
 import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
@@ -22,8 +23,10 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <ClerkProvider>
-      <html lang="en" className={`${GeistSans.variable}`}>
+      
+      <html lang="en" className={`${GeistSans.variable}`} suppressHydrationWarning>
         <body suppressHydrationWarning>
+          
           <header className="flex justify-end items-center p-4 gap-4 h-16">
             <SignedOut>
               <SignInButton />
@@ -33,7 +36,9 @@ export default function RootLayout({
               <UserButton />
             </SignedIn>
           </header>
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

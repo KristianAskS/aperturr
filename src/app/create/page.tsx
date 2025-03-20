@@ -4,20 +4,20 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
+
 import { useAuth } from "@clerk/nextjs";
 import { useState, useEffect } from "react";
 import { CreateFineForm } from "~/components/create-fine-form";
+import ParagraphList from "~/components/paragraph-list";
 import { ParagraphType } from "~/server/db/schema";
 
 export default function Create() {
   const { userId } = useAuth();
-
   const [paragraphs, setParagraphs] = useState<ParagraphType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showLoginPrompt, setShowLoginPrompt] = useState<boolean>(false);
 
   useEffect(() => {
-    // If no user is logged in, wait 1 second before showing the message.
     if (!userId) {
       const timer = setTimeout(() => {
         setShowLoginPrompt(true);
@@ -34,7 +34,6 @@ export default function Create() {
           console.error("Error fetching paragraphs");
           return;
         }
-        // data.message is the array of paragraphs
         setParagraphs(data.message);
         console.log(data);
       } catch (error) {
@@ -49,31 +48,41 @@ export default function Create() {
 
   const onCreateFine = async (fine: any) => {
     console.log("Skidibi", fine);
-    // Further logic to create a fine goes here...
+    // Logic to send fine data to API...
   };
 
-  // If not logged in, show a delayed message.
   if (!userId) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen py-2">
-        <h1 className="text-3xl font-bold">Create Fine</h1>
+      <div className="flex flex-col items-center justify-center min-h-screen  p-6">
+        <h1 className="text-4xl font-bold ">Create Fine</h1>
         {showLoginPrompt ? (
-          <p>You haven't logged in. Please log in to fetch and create fines.</p>
+          <p className="text-lg ">
+            You haven't logged in. Please log in to fetch and create fines.
+          </p>
         ) : (
-          <p>Loading...</p>
+          <p className="text-lg ">Loading...</p>
         )}
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <h1 className="text-3xl font-bold">Create Fine</h1>
+    <div className="container mx-auto max-w-4xl py-10 px-6  shadow-lg rounded-lg">
+      <header className="text-center mb-6">
+        <h1 className="text-4xl font-bold ">Create Fine</h1>
+        <p className="">Fill out the form below to register a fine.</p>
+      </header>
+
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-center text-lg ">Loading...</p>
       ) : (
-        <CreateFineForm onCreateFine={onCreateFine} paragraphs={paragraphs} />
+        <section className=" p-6 rounded-lg shadow-md">
+          <CreateFineForm onCreateFine={onCreateFine} paragraphs={paragraphs} />
+        </section>
       )}
+      <hr className="border-b border-muted/40 padding-10 mb-8" />
+      <h2 className="text-2xl font-semibold mb-8 text-center">Paragrafer</h2>
+      {loading ? <p className="text-center">Laster...</p> : <ParagraphList paragraphs={paragraphs} />}
     </div>
   );
 }
