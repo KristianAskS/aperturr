@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 "use client";
 
 import Link from "next/link";
@@ -22,19 +23,20 @@ import {
 
 // Form shape
 interface FineFormData {
-  offender: string;
+  offenderClerkId: string;
   description: string;
   fines: number;
-  paragraph: string; // shortId from the paragraphs
+  paragraphId: string; // shortId from the paragraphs
   image: File | null;
 }
 
 export type CreateFineFormProps = {
   onCreateFine: (fine: FineFormData) => void;
   paragraphs: ParagraphType[];
+  clerkIdUsernamePairs: [string, string][];
 };
 
-export function CreateFineForm({ onCreateFine, paragraphs }: CreateFineFormProps) {
+export function CreateFineForm({ onCreateFine, paragraphs, clerkIdUsernamePairs }: CreateFineFormProps) {
   const [offender, setOffender] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [fines, setFines] = useState<number>(1);
@@ -48,10 +50,10 @@ export function CreateFineForm({ onCreateFine, paragraphs }: CreateFineFormProps
 
     if (offender && description && fines && paragraph) {
       const formData: FineFormData = {
-        offender,
+        offenderClerkId : offender,
         description,
         fines,
-        paragraph,
+        paragraphId: paragraph,
         image,
       };
       onCreateFine(formData);
@@ -77,12 +79,12 @@ export function CreateFineForm({ onCreateFine, paragraphs }: CreateFineFormProps
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <Link href="/" className="flex items-center text-blue-500 hover:underline mb-4">
+      <Link href="/" className="flex items-center text-blue-500 hover:underline mb-4 font-bold">
         <ArrowLeft className="mr-2" />
         Tilbake
       </Link>
 
-      <form onSubmit={handleSubmit} className="space-y-4 border rounded-lg shadow-md p-4">
+      <form onSubmit={handleSubmit} className="space-y-4 border rounded-lg shadow-md p-4 text-3xl">
         <div className="flex space-x-4">
           {/* Offender */}
           <div className="flex-1">
@@ -94,10 +96,11 @@ export function CreateFineForm({ onCreateFine, paragraphs }: CreateFineFormProps
                 <SelectValue placeholder="Velg den tiltalte" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ola_nordmann">Ola Nordmann</SelectItem>
-                <SelectItem value="kari_nordmann">Kari Nordmann</SelectItem>
-                <SelectItem value="per_olsen">Per Olsen</SelectItem>
-                <SelectItem value="nina_hansen">Nina Hansen</SelectItem>
+                {clerkIdUsernamePairs.map((name) => (
+                  <SelectItem key={name[0]} value={name[0]}>
+                    {name[1]}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

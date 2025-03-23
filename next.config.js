@@ -5,6 +5,15 @@
 import "./src/env.js";
 
 /** @type {import("next").NextConfig} */
-const config = {};
+// add cors for /api/*
+const config = {
+    async headers() {
+        return [
+            {source: '/api/:path*', headers: [
+                {key: 'Access-Control-Allow-Credentials', value: '*'},
+            ]},
+        ];
+    },
+};
 
-export default config;
+export default config;  
