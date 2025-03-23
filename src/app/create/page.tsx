@@ -20,7 +20,6 @@ export default function Create() {
   const [showLoginPrompt, setShowLoginPrompt] = useState<boolean>(false);
 
   useEffect(() => {
-    // If no userId is found, show a login prompt after a short timeout
     if (!userId) {
       const timer = setTimeout(() => {
         setShowLoginPrompt(true);
@@ -29,7 +28,6 @@ export default function Create() {
       return () => clearTimeout(timer);
     }
 
-    // Otherwise, fetch paragraphs and usernames
     const fetchData = async () => {
       setLoading(true);
       try {
@@ -61,35 +59,29 @@ export default function Create() {
     fetchData();
   }, [userId]);
 
-  // todo fix the form shit
-  const onCreateFine = async (FineForm: any) => {
-    const { offenderClerkId, description, fines, paragraphId, image } = FineForm;
-    // send a post to /api/fine
-    console.log("Fine data:", FineForm);
-    // Logic to send fine data to API...
-    const res = await fetch("/api/fine", {
+  const onCreateFine = async (fineFormData: {
+    offenderClerkId: string;
+    description: string;
+    fines: number;
+    paragraphId: string;
+    imageUrl?: string; // note type
+  }) => {
+    await fetch("/api/fine", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        offenderClerkId,
-        description,
-        fines,
-        paragraphId,
-        image,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(fineFormData),
     });
-
-    console.log(res);
-
   };
 
-  // If user is not logged in, show a "loading/spinner" or a prompt
+  if (loading)
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-2">
+      </div>
+    );
+
   if (!userId)
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-2">
-        <p className="text-lg text-2xl">Laster...</p>
         {showLoginPrompt && <p>Vennligst logg inn for å opprette bøter.</p>}
       </div>
     );
@@ -97,32 +89,22 @@ export default function Create() {
   return (
     <div className="container mx-auto max-w-5xl py-1 px-1">
       <header className="text-center mb-1">
-        <h1 className="text-6xl font-bold">Opprett bot</h1>
-        <p>Fyll ut malen for å registrere ny bot</p>
+        <h1 className="text-5xl font-bold py-1">Opprett bot</h1>
+        <p className="text-sm">Fyll ut malen for å registrere ny bot</p>
       </header>
 
-      {loading ? (
-        <p className="text-center text-lg">Loading...</p>
-      ) : (
-        <section className="rounded-lg">
-          <CreateFineForm
-            onCreateFine={onCreateFine}
-            paragraphs={paragraphs}
-            clerkIdUsernamePairs={clerkIdUsernamePairs}
-          />
-        </section>
-      )}
+      <section className="rounded-lg">
+        <CreateFineForm
+          onCreateFine={onCreateFine}
+          paragraphs={paragraphs}
+          clerkIdUsernamePairs={clerkIdUsernamePairs}
+        />
+      </section>
 
       <hr className="border-b border-muted/40 padding-10 mb-8" />
 
-      {loading ? (
-        <p className="text-center">Laster...</p>
-      ) : (
-        <>
-          <h2 className="text-4xl font-semibold mb-8 text-center">Paragrafer</h2>
-          <ParagraphList paragraphs={paragraphs} />
-        </>
-      )}
+      <h2 className="text-4xl font-semibold mb-8 text-center">Paragrafer</h2>
+      <ParagraphList paragraphs={paragraphs} />
     </div>
   );
 }

@@ -43,7 +43,7 @@ export async function POST(req: Request) {
 
     // Parse body
     const body = await req.json();
-    const { offenderClerkId, description, fines, paragraphId, image } = body;
+    const { offenderClerkId, description, fines, paragraphId, imageUrl } = body;
 
     // Basic validation
     if (!offenderClerkId || !description || !fines || !paragraphId) {
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
       paragraphShortId: paragraphModel.shortId,
       description: description,
       numFines: Number(fines),
-      imageLink: image ?? null,
+      imageLink: imageUrl ?? null,
       offenderClerkId: offenderUserModel.clerkUserId,
       offenderName: offenderUserModel.username,
       issuerName: issuerUserModel.username,

@@ -6,6 +6,8 @@
 // app/fines/page.tsx
 "use client";
 
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import FineList from "~/components/fine-list";
 
@@ -34,16 +36,34 @@ export default function FinesPage() {
   }, []);
 
   if (loading) {
-    return <p className="p-4">Laster bøter...</p>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+      </div>
+    );
   }
 
   if (error) {
-    return <p className="p-4 text-red-500">Feil: {error}</p>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <p className="p-4 text-red-500">Feil: {error}</p>
+      </div>
+    );
   }
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
-      <h1 className="mb-4 text-2xl font-bold">Bøter</h1>
+      <header className="text-center mb-1">
+        <h1 className="text-6xl font-bold">Bøter</h1>
+      </header>
+
+      <Link
+        href="/"
+        className="flex items-center text-blue-500 hover:underline mb-4 font-bold"
+      >
+        <ArrowLeft className="mr-2" />
+        Tilbake
+      </Link>
+
       {fines.length === 0 ? (
         <p>Ingen bøter funnet.</p>
       ) : (

@@ -12,11 +12,11 @@ const generateShortId = () => {
 };
 
 export async function POST(req: Request) {
-  try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+   try {
+  //   const { userId } = await auth();
+  //   if (!userId) {
+  //     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  //   }
 
     const body = await req.json();
     const { title, description, maxFines } = body;

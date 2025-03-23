@@ -115,3 +115,13 @@
     --chart-5: 340 75% 55%;
   }
 }
+
+
+
+/* fonts  */
+@font-face {
+  font-family: "basement-font";
+  src: url("/fonts/basement-font.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+}

@@ -9,7 +9,6 @@ import Link from "next/link";
 import { useAuth } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
-import { UploadButton } from "~/utils/uploadthing";
 
 export default function HomePage() {
   const { userId } = useAuth();
@@ -38,10 +37,13 @@ export default function HomePage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-2">
-      <h1 className="text-3xl font-bold">
-        {name ? `Halla, ${name}.` : "Hello"}
+      <h1 className="text-5xl font-bold ">
+        Aperturr. 
       </h1>
+      <div className="text-center py-4"></div>
 
+      {/* make them stand next to each other */}
+      <div className="flex flex-col items-center gap-4"></div>
       {userId && (
         <Link href="/create">
           <Button variant="default">Opprett ny bot</Button>

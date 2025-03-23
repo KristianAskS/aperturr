@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 "use client";
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { useState, useRef } from "react";
 
-// Drizzle paragraph type
-import { ParagraphType } from "~/server/db/schema";
+import { uploadFiles } from "~/utils/uploadthing";
 
-// UI imports
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -21,65 +21,99 @@ import {
   SelectValue,
 } from "./ui/select";
 
-// Form shape
+import { ParagraphType } from "~/server/db/schema";
+
 interface FineFormData {
   offenderClerkId: string;
   description: string;
   fines: number;
-  paragraphId: string; // shortId from the paragraphs
-  image: File | null;
+  paragraphId: string;
+  imageUrl?: string;
 }
 
+// Props for your form
 export type CreateFineFormProps = {
   onCreateFine: (fine: FineFormData) => void;
   paragraphs: ParagraphType[];
   clerkIdUsernamePairs: [string, string][];
 };
 
-export function CreateFineForm({ onCreateFine, paragraphs, clerkIdUsernamePairs }: CreateFineFormProps) {
-  const [offender, setOffender] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [fines, setFines] = useState<number>(1);
-  const [paragraph, setParagraph] = useState<string>("");
-  const [image, setImage] = useState<File | null>(null);
+export function CreateFineForm({
+  onCreateFine,
+  paragraphs,
+  clerkIdUsernamePairs,
+}: CreateFineFormProps) {
+  const [offender, setOffender] = useState("");
+  const [description, setDescription] = useState("");
+  const [fines, setFines] = useState("");
+  const [paragraph, setParagraph] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (offender && description && fines && paragraph) {
-      const formData: FineFormData = {
-        offenderClerkId : offender,
-        description,
-        fines,
-        paragraphId: paragraph,
-        image,
-      };
-      onCreateFine(formData);
+    const parsedFines = parseInt(fines, 10);
+    if (!offender || !description || !paragraph || !fines || isNaN(parsedFines)) {
+      return;
+    }
 
-      // Reset fields
-      setOffender("");
-      setDescription("");
-      setFines(1);
-      setParagraph("");
-      setImage(null);
-      if (inputRef.current) {
-        inputRef.current.value = "";
+    const formData: FineFormData = {
+      offenderClerkId: offender,
+      description,
+      fines: parsedFines,
+      paragraphId: paragraph,
+    };
+
+    if (selectedFile) {
+      try {
+        const response = await uploadFiles("imageUploader", {
+          files: [selectedFile],
+          // Optional callbacks:
+          onUploadBegin: ({ file }) => {
+            console.log("Starting upload for:", file);
+          },
+          onUploadProgress: ({ file, progress }) => {
+            // For large uploads, you can show progress
+            console.log("Uploading:", file.name, "Progress:", progress);
+          },
+        });
+
+        const uploadedFile = response[0];
+        if (uploadedFile) {
+          formData.imageUrl = uploadedFile.url;
+        }
+      } catch (err) {
+        console.error("UploadThing error:", err);
       }
+    }
+
+    onCreateFine(formData);
+
+    setOffender("");
+    setDescription("");
+    setFines("");
+    setParagraph("");
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
   const handleResetImage = () => {
-    setImage(null);
-    if (inputRef.current) {
-      inputRef.current.value = "";
+    setSelectedFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
   return (
     <div className="max-w-2xl mx-auto p-4">
-      <Link href="/" className="flex items-center text-blue-500 hover:underline mb-4 font-bold">
+      <Link
+        href="/"
+        className="flex items-center text-blue-500 hover:underline mb-4 font-bold"
+      >
         <ArrowLeft className="mr-2" />
         Tilbake
       </Link>
@@ -96,9 +130,9 @@ export function CreateFineForm({ onCreateFine, paragraphs, clerkIdUsernamePairs 
                 <SelectValue placeholder="Velg den tiltalte" />
               </SelectTrigger>
               <SelectContent>
-                {clerkIdUsernamePairs.map((name) => (
-                  <SelectItem key={name[0]} value={name[0]}>
-                    {name[1]}
+                {clerkIdUsernamePairs.map(([clerkId, username]) => (
+                  <SelectItem key={clerkId} value={clerkId}>
+                    {username}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -140,7 +174,6 @@ export function CreateFineForm({ onCreateFine, paragraphs, clerkIdUsernamePairs 
           />
         </div>
 
-        {/* Number of Fines */}
         <div>
           <Label htmlFor="fines" className="mb-2 block">
             Antall bøter
@@ -148,11 +181,11 @@ export function CreateFineForm({ onCreateFine, paragraphs, clerkIdUsernamePairs 
           <Input
             id="fines"
             type="number"
-            value={fines}
-            onChange={(e) => setFines(Number(e.target.value))}
-            placeholder="Antall bøter"
-            min={1}
             required
+            value={fines}
+            onChange={(e) => setFines(e.target.value)}
+            placeholder="Antall bøter"
+            className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
         </div>
 
@@ -165,15 +198,19 @@ export function CreateFineForm({ onCreateFine, paragraphs, clerkIdUsernamePairs 
             <Input
               id="image"
               type="file"
-              ref={inputRef}
+              ref={fileInputRef}
               onChange={(e) => {
                 if (e.target.files?.[0]) {
-                  setImage(e.target.files[0]);
+                  setSelectedFile(e.target.files[0]);
                 }
               }}
             />
-            {image && (
-              <Button type="button" variant="destructive" onClick={handleResetImage}>
+            {selectedFile && (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleResetImage}
+              >
                 Nullstill bilde
               </Button>
             )}
