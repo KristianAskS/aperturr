@@ -1,34 +1,36 @@
-import * as React from "react"
-import { ParagraphType } from "~/server/db/schema"
-import Link from "next/link"
-
-// takes a list of paragraphs described in 
-// paragraphs.ts
-
-// and renders a list of paragraphs
-// with a link to the fines page
-// for each paragraph
-// use shadcn
+import * as React from "react";
+import { ParagraphType } from "~/server/db/schema";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "~/components/ui/accordion";
+import { Badge } from "~/components/ui/badge";
 
 export default function ParagraphList({ paragraphs }: { paragraphs: ParagraphType[] }) {
   return (
-    <ul className="flex flex-col gap-4 p-4">
-      {paragraphs.map((paragraph) => (
-        <li key={paragraph.shortId}>
-          <Link
-            href={`/fines/${paragraph.shortId}`}
-            className="flex items-center gap-3 rounded-md border border-muted p-2 text-sm transition-colors hover:bg-muted/50 dark:border-muted-foreground dark:hover:bg-muted"
+    <div className="mx-auto w-full max-w-xl  p-4">
+      <Accordion type="multiple" className="w-full space-y-1">
+        {paragraphs.map((paragraph) => (
+          <AccordionItem
+            key={paragraph.shortId}
+            value={paragraph.shortId}
+            className="border border-muted rounded-md"
           >
-            <p className="font-medium">{paragraph.title}</p>
-            <p className="text-muted-foreground">{paragraph.description}</p>
-          </Link>
-        </li>
-      ))}
-    </ul>
-  )
+            <AccordionTrigger className="px-4 py-2 text-left text-sm font-medium">
+              {paragraph.title}
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4 text-sm text-muted-foreground space-y-2">
+              <p>{paragraph.description}</p>
+              <Badge variant="outline">Maks bøter: {paragraph.maxFines}</Badge>
+              <p className="text-xs text-muted-foreground">
+                Paragraf-ID: <span className="font-mono">{paragraph.shortId}</span>
+              </p>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
+      </Accordion>
+    </div>
+  );
 }
-
-
-
-
-
