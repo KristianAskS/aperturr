@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 "use client";
 
 import Link from "next/link";
@@ -14,6 +13,13 @@ export default function HomePage() {
   const { userId } = useAuth();
   const [name, setName] = useState<string | null>(null);
 
+  const [didWait, setDidWait] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDidWait(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     if (!userId) return;
 
@@ -21,7 +27,6 @@ export default function HomePage() {
       try {
         const res = await fetch("/api/profile");
         const data = await res.json();
-
         if (res.ok) {
           setName(data.username);
         } else {
@@ -31,31 +36,33 @@ export default function HomePage() {
         console.error("Error fetching profile:", error);
       }
     };
-
     fetchProfile();
   }, [userId]);
 
+  if (!userId && !didWait) {
+    return null;
+  }
+
+  if (!userId && didWait) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center gap-2">
+        <h1 className="text-5xl font-bold">Not logged in</h1>
+      </main>
+    );
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-2">
-      <h1 className="text-5xl font-bold ">
-        Aperturr. 
-      </h1>
-      <div className="text-center py-4"></div>
-
-      {/* make them stand next to each other */}
-      <div className="flex flex-col items-center gap-4"></div>
-      {userId && (
+      <h1 className="text-5xl font-bold">Aperturr.</h1>
+      <div className="text-center py-4" />
+      <div className="flex flex-col items-center gap-4">
         <Link href="/create">
           <Button variant="default">Opprett ny bot</Button>
         </Link>
-      )}
-      {userId && (
-        <Link href={"/fines"}>
+        <Link href="/fines">
           <Button variant="default">Bøter</Button>
         </Link>
-      )}
-
-      {/* <UploadButton endpoint="imageUploader" /> */}
+      </div>
     </main>
   );
 }

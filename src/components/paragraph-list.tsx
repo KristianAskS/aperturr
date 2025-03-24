@@ -23,7 +23,7 @@ export default function ParagraphList({ paragraphs }: { paragraphs: ParagraphTyp
             </AccordionTrigger>
             <AccordionContent className="px-4 pb-4 text-sm text-muted-foreground space-y-2">
               <p>{paragraph.description}</p>
-              <Badge variant="outline">Maks bøter: {paragraph.maxFines}</Badge>
+              <Badge variant="outline">Maks antall bøter: {paragraph.maxFines}</Badge>
               <p className="text-xs text-muted-foreground">
                 Paragraf-ID: <span className="font-mono">{paragraph.shortId}</span>
               </p>

@@ -82,14 +82,14 @@ export default function FineList({ fines }: { fines: FineType[] }) {
             >
               <AccordionTrigger className="px-4 py-2 text-left text-sm font-medium">
                 <div className="flex items-center space-x-2 md:space-x-4 w-full overflow-hidden">
-                  <h1 className="text-3xl font-bold">{fine.numFines}</h1>
+                  <h1 className="text-xl font-bold">{fine.numFines}</h1>
                   <div className="text-start break-words">
                     <div className="flex items-center space-x-1">
-                      <h1 className="text-xl md:text-base font-semibold">
+                      <h1 className="text-sm md:text-base font-semibold">
                         {fine.offenderName}
                       </h1>
                     </div>
-                    <h1 className="text-lg md:text-sm">{fine.paragraphTitle}</h1>
+                    <h1 className="text-md md:text-sm">{fine.paragraphTitle}</h1>
                   </div>
                 </div>
               </AccordionTrigger>
@@ -164,7 +164,6 @@ export default function FineList({ fines }: { fines: FineType[] }) {
                         />
                       </div>
                     )}
-                    
                     <Badge variant="outline" className="mt-1">
                       Meldt av {fine.issuerName}
                     </Badge>

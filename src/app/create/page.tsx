@@ -18,6 +18,7 @@ export default function Create() {
   const [clerkIdUsernamePairs, setClerkIdUsernamePairs] = useState<[string, string][]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [showLoginPrompt, setShowLoginPrompt] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   useEffect(() => {
     if (!userId) {
@@ -64,27 +65,42 @@ export default function Create() {
     description: string;
     fines: number;
     paragraphId: string;
-    imageUrl?: string; // note type
+    imageUrl?: string;
   }) => {
-    await fetch("/api/fine", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(fineFormData),
-    });
+    setSuccessMessage("");
+    try {
+      const response = await fetch("/api/fine", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fineFormData),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Error creating fine");
+      }
+  
+      setSuccessMessage("Boten ble opprettet!");
+      return true;
+    } catch (error) {
+      console.error("Failed to create fine:", error);
+      return false;
+    }
   };
 
-  if (loading)
+  if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-2">
+      <div className="">
       </div>
     );
+  }
 
-  if (!userId)
+  if (!userId) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-2">
         {showLoginPrompt && <p>Vennligst logg inn for å opprette bøter.</p>}
       </div>
     );
+  }
 
   return (
     <div className="container mx-auto max-w-5xl py-1 px-1">
@@ -93,7 +109,8 @@ export default function Create() {
         <p className="text-sm">Fyll ut malen for å registrere ny bot</p>
       </header>
 
-      <section className="rounded-lg">
+      <section className="rounded-lg ">
+
         <CreateFineForm
           onCreateFine={onCreateFine}
           paragraphs={paragraphs}

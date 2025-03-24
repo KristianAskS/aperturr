@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 "use client";
 
 import Link from "next/link";
@@ -31,9 +34,8 @@ interface FineFormData {
   imageUrl?: string;
 }
 
-// Props for your form
 export type CreateFineFormProps = {
-  onCreateFine: (fine: FineFormData) => void;
+  onCreateFine: (fine: FineFormData) => Promise<boolean>;
   paragraphs: ParagraphType[];
   clerkIdUsernamePairs: [string, string][];
 };
@@ -49,13 +51,26 @@ export function CreateFineForm({
   const [paragraph, setParagraph] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+  const [buttonLabel, setButtonLabel] = useState("Opprett bot");
+  const [isUploading, setIsUploading] = useState(false);
+
+  const [uploadError, setUploadError] = useState("");
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
+    if (isUploading) return;
+
+    setIsUploading(true);
+    setButtonLabel("Laster opp...");
+    setUploadError("");
+
     const parsedFines = parseInt(fines, 10);
     if (!offender || !description || !paragraph || !fines || isNaN(parsedFines)) {
+      setButtonLabel("Opprett bot");
+      setIsUploading(false);
       return;
     }
 
@@ -70,39 +85,51 @@ export function CreateFineForm({
       try {
         const response = await uploadFiles("imageUploader", {
           files: [selectedFile],
-          // Optional callbacks:
           onUploadBegin: ({ file }) => {
             console.log("Starting upload for:", file);
           },
           onUploadProgress: ({ file, progress }) => {
-            // For large uploads, you can show progress
             console.log("Uploading:", file.name, "Progress:", progress);
           },
         });
-
         const uploadedFile = response[0];
         if (uploadedFile) {
           formData.imageUrl = uploadedFile.url;
         }
       } catch (err) {
         console.error("UploadThing error:", err);
+        // 2. Capture uploader error in state
+        setUploadError("Feil ved opplasting av bilde. Prøv igjen.");
       }
     }
 
-    onCreateFine(formData);
+    const isSuccess = await onCreateFine(formData);
 
-    setOffender("");
-    setDescription("");
-    setFines("");
-    setParagraph("");
-    setSelectedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+    if (isSuccess) {
+      setButtonLabel("Bot opprettet!");
+      setTimeout(() => {
+        setButtonLabel("Opprett bot");
+        setIsUploading(false);
+      }, 2000);
+
+      // Clear out form if successful
+      setOffender("");
+      setDescription("");
+      setFines("");
+      setParagraph("");
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } else {
+      setButtonLabel("Opprett bot");
+      setIsUploading(false);
     }
   };
 
   const handleResetImage = () => {
     setSelectedFile(null);
+    setUploadError(""); // Clear the error if the user resets the image
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -118,9 +145,11 @@ export function CreateFineForm({
         Tilbake
       </Link>
 
-      <form onSubmit={handleSubmit} className="space-y-4 border rounded-lg shadow-md p-4 text-3xl">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 border rounded-lg shadow-md p-4 text-3xl"
+      >
         <div className="flex space-x-4">
-          {/* Offender */}
           <div className="flex-1">
             <Label htmlFor="offender" className="mb-2 block">
               Tiltalte
@@ -139,7 +168,6 @@ export function CreateFineForm({
             </Select>
           </div>
 
-          {/* Paragraph / Lovbrudd */}
           <div className="flex-1">
             <Label htmlFor="paragraph" className="mb-2 block">
               Lovbrudd
@@ -159,7 +187,6 @@ export function CreateFineForm({
           </div>
         </div>
 
-        {/* Description */}
         <div>
           <Label htmlFor="description" className="mb-2 block">
             Beskrivelse
@@ -189,7 +216,6 @@ export function CreateFineForm({
           />
         </div>
 
-        {/* Image Upload */}
         <div>
           <Label htmlFor="image" className="mb-2 block">
             Bilde (valgfri)
@@ -202,6 +228,7 @@ export function CreateFineForm({
               onChange={(e) => {
                 if (e.target.files?.[0]) {
                   setSelectedFile(e.target.files[0]);
+                  setUploadError(""); // Clear error upon picking a new file
                 }
               }}
             />
@@ -215,10 +242,20 @@ export function CreateFineForm({
               </Button>
             )}
           </div>
+          {/* 3. Show any upload error message here */}
+          {uploadError && (
+            <p className="text-red-500 mt-2 text-sm">
+              {uploadError}
+            </p>
+          )}
         </div>
 
-        <Button type="submit" className="w-full">
-          Opprett bot
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={isUploading}
+        >
+          {buttonLabel}
         </Button>
       </form>
     </div>
