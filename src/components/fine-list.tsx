@@ -35,6 +35,7 @@ export default function FineList({ fines }: { fines: FineType[] }) {
   const finesByOffender = React.useMemo(() => {
     const grouped: Record<string, FineType[]> = {};
     for (const fine of sortedFines) {
+      if (!fine.offenderName) continue;
       if (!grouped[fine.offenderName]) {
         grouped[fine.offenderName] = [];
       }
@@ -80,18 +81,21 @@ export default function FineList({ fines }: { fines: FineType[] }) {
               value={String(fine.id)}
               className="border border-muted rounded-md"
             >
-              <AccordionTrigger className="px-4 py-2 text-left text-sm font-medium">
-                <div className="flex items-center space-x-2 md:space-x-4 w-full overflow-hidden">
-                  <h1 className="text-xl font-bold">{fine.numFines}</h1>
-                  <div className="text-start break-words">
-                    <div className="flex items-center space-x-1">
-                      <h1 className="text-sm md:text-base font-semibold">
-                        {fine.offenderName}
-                      </h1>
+            <AccordionTrigger className="px-4 py-2 text-left text-sm font-medium">
+              <div className="flex items-center space-x-2 md:space-x-4 w-full overflow-hidden">
+                <h1 className="text-xl font-bold">{fine.numFines}</h1>
+                <div className="text-start break-words w-full">
+                  <div className="flex items-center justify-between w-full">
+                    <h1 className="text-sm md:text-base font-semibold">
+                      {fine.offenderName}
+                    </h1>
+                    <div className="flex items-center justify-end space-x-1 text-[0.6rem] font-mono text-muted-foreground mr-2.5">
+                      Opprettet {formatDate(fine.date)}
                     </div>
-                    <h1 className="text-md md:text-sm">{fine.paragraphTitle}</h1>
                   </div>
+                  <h1 className="text-md md:text-sm">{fine.paragraphTitle}</h1>
                 </div>
+              </div>
               </AccordionTrigger>
 
               <AccordionContent className="px-4 pb-4 text-sm text-muted-foreground space-y-2">
@@ -110,7 +114,6 @@ export default function FineList({ fines }: { fines: FineType[] }) {
                 <Badge variant="outline">Meldt av {fine.issuerName}</Badge>
                 <p className="text-xs text-muted-foreground">
                   <span className="font-mono">
-                    Opprettet {formatDate(fine.date)}
                   </span>
                 </p>
               </AccordionContent>
