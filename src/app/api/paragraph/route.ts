@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
@@ -6,6 +8,7 @@ import { paragraph } from "~/server/db/schema";
 import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
+import { user } from "~/server/db/schema";
 
 const generateShortId = () => {
   return Math.random().toString(36).substring(2, 8);
@@ -13,15 +16,23 @@ const generateShortId = () => {
 
 export async function POST(req: Request) {
    try {
-  //   const { userId } = await auth();
-  //   if (!userId) {
-  //     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  //   }
-
+     const { userId } = await auth();
+     if (!userId) {
+       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+     }
     const body = await req.json();
     const { title, description, maxFines } = body;
 
-    // Basic validation
+    const [currentUser] = await db.select().from(user).where(eq(user.clerkUserId, userId));
+
+    if (!currentUser) {
+      return NextResponse.json({ message: "Could not find user" }, { status: 401 });
+    }
+
+    if (currentUser.email != "kristians.sin.konto@gmail.com") {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
     if (!title || !description || !maxFines) {
       return NextResponse.json({ message: "Missing required fields." }, { status: 400 });
     }

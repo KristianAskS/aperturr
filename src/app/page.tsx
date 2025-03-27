@@ -62,6 +62,9 @@ export default function HomePage() {
         <Link href="/fines">
           <Button variant="default">Bøter</Button>
         </Link>
+        <Link href="/create/paragraph">
+          <Button variant="default">Opprett en ny paragraf</Button>
+        </Link>
       </div>
     </main>
   );
