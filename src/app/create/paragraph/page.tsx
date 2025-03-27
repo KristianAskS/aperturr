@@ -13,7 +13,8 @@ export default function CreateParagraph() {
 
   const [paragraphName, setParagraphName] = useState("");
   const [paragraphDescription, setParagraphDescription] = useState("");
-  const [maxFines, setMaxFines] = useState<number>(0);
+  // Changed maxFines state to string so it can be empty initially
+  const [maxFines, setMaxFines] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -33,7 +34,6 @@ export default function CreateParagraph() {
   if (!userId) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p>Vennligst logg inn for å opprette paragraf.</p>
       </div>
     );
   }
@@ -49,6 +49,12 @@ export default function CreateParagraph() {
       return;
     }
 
+    const parsedMaxFines = parseInt(maxFines, 10);
+    if (isNaN(parsedMaxFines)) {
+      setErrorMessage("Maks antall bøter må være et tall.");
+      return;
+    }
+
     try {
       const response = await fetch("/api/paragraph", {
         method: "POST",
@@ -56,19 +62,19 @@ export default function CreateParagraph() {
         body: JSON.stringify({
           title: paragraphName,
           description: paragraphDescription,
-          maxFines,
+          maxFines: parsedMaxFines,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Error creating paragraph", );
+        throw new Error("Error creating paragraph");
       }
 
       setSuccessMessage("Paragraf opprettet!");
       // Clear form fields
       setParagraphName("");
       setParagraphDescription("");
-      setMaxFines(0);
+      setMaxFines("");
     } catch (error) {
       console.error("Failed to create paragraph:", error);
       setErrorMessage("Noe gikk galt. Prøv igjen.");
@@ -120,10 +126,8 @@ export default function CreateParagraph() {
             id="maxFines"
             type="number"
             value={maxFines}
-            onChange={(e) =>
-              setMaxFines(parseInt(e.target.value, 10) || 0)
-            }
-            placeholder="0"
+            onChange={(e) => setMaxFines(e.target.value)}
+            placeholder="Angi antall bøter"
             required
             className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
