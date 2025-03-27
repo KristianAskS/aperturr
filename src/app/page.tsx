@@ -46,7 +46,7 @@ export default function HomePage() {
   if (!userId && didWait) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-2">
-        <h1 className="text-5xl font-bold">Not logged in</h1>
+        <h1 className="text-5xl font-bold">Gjør deg til kjenne.</h1>
       </main>
     );
   }

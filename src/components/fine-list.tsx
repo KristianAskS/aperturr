@@ -32,17 +32,19 @@ export default function FineList({ fines }: { fines: FineType[] }) {
   }, [fines]);
 
   // Group fines by offender
-  const finesByOffender = React.useMemo(() => {
-    const grouped: Record<string, FineType[]> = {};
-    for (const fine of sortedFines) {
-      if (!fine.offenderName) continue;
-      if (!grouped[fine.offenderName]) {
-        grouped[fine.offenderName] = [];
-      }
-      grouped[fine.offenderName].push(fine);
+// Group fines by offender
+const finesByOffender = React.useMemo(() => {
+  const grouped: Record<string, FineType[]> = {};
+  for (const fine of sortedFines) {
+    if (!fine.offenderName) continue;
+    const offender = fine.offenderName; // Now we know it's defined
+    if (!grouped[offender]) {
+      grouped[offender] = [];
     }
-    return grouped;
-  }, [sortedFines]);
+    grouped[offender].push(fine);
+  }
+  return grouped;
+}, [sortedFines]);
 
   return (
     <div className="mx-auto w-full max-w-xl p-4">
@@ -181,7 +183,8 @@ export default function FineList({ fines }: { fines: FineType[] }) {
   );
 }
 
-const formatDate = (date: string) => {
+const formatDate = (date?: string) => {
+  if (!date) return "Ukjent dato";
   const dateObject = new Date(date);
   return dateObject.toLocaleDateString("nb-NO", {
     year: "numeric",
