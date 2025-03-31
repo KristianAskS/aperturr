@@ -129,7 +129,7 @@ export function CreateFineForm({
 
   const handleResetImage = () => {
     setSelectedFile(null);
-    setUploadError(""); // Clear the error if the user resets the image
+    setUploadError("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }

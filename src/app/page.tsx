@@ -56,16 +56,16 @@ export default function HomePage() {
       <h1 className="text-5xl font-bold">Aperturr.</h1>
       <div className="text-center py-4" />
       <div className="flex flex-col items-center gap-4">
-        <Link href="/create">
+        <Link href="/fine/create">
           <Button variant="default">Opprett ny bot</Button>
         </Link>
         <Link href="/fines">
           <Button variant="default">Bøter</Button>
         </Link>
-        <Link href="/create/paragraph">
+        <Link href="admin/paragraph/create">
           <Button variant="default">Opprett en ny paragraf</Button>
         </Link>
-        <Link href="/paragraph/edit">
+        <Link href="admin/paragraph/edit">
           <Button variant="default">Rediger paragrafer</Button>
         </Link>
       </div>

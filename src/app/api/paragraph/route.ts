@@ -37,10 +37,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Missing required fields." }, { status: 400 });
     }
 
-    // Generate a unique short_id
     let shortId = generateShortId();
 
-    // Ensure the short_id is unique in the database
     let existingParagraph = await db
       .select()
       .from(paragraph)
