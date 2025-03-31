@@ -5,6 +5,7 @@ import { paragraph, user } from "~/server/db/schema";
 import { db } from "~/server/db";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
+import { env } from "~/env";
 
 const fetchCurrentUser = async (userId: string) => {
   const [currentUser] = await db.select().from(user).where(eq(user.clerkUserId, userId));
@@ -22,7 +23,7 @@ export async function POST(req: Request) {
     }
 
     const currentUser = await fetchCurrentUser(userId);
-    if (currentUser.email !== "kristians.sin.konto@gmail.com") {
+    if (currentUser.email !== env.ADMIN_EMAIL) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 

@@ -12,8 +12,9 @@ import { NextResponse } from 'next/server';
 import { db } from '~/server/db';
 import { user } from '~/server/db/schema';
 import { eq } from 'drizzle-orm';
+import { env } from '~/env';
 
-const webhookSecret = "";
+const webhookSecret = env.CLERK_WEBHOOK_SECRET;
 
 export async function POST(request: Request) {
   const payload = await request.json();
@@ -37,13 +38,11 @@ export async function POST(request: Request) {
   if (evt.type === 'user.created') {
     const clerkUser = evt.data;
 
-    // Check if user already exists
     const existingUser = await db
       .select()
       .from(user)
       .where(eq(user.email, clerkUser.email_addresses[0].email_address));
 
-    // Only create if this user doesn't exist yet
     if (existingUser.length === 0) {
       const firstName = clerkUser.first_name;
       const lastName = clerkUser.last_name;
@@ -65,7 +64,9 @@ export async function POST(request: Request) {
         clerkUserId: clerkUser.id,
         profilePicture: clerkUser.profile_image_url,
       });
+
     }
+
   }
 
   return NextResponse.json({ success: true });
