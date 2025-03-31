@@ -9,6 +9,7 @@ import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import { user } from "~/server/db/schema";
+import { env } from "~/env";
 
 const generateShortId = () => {
   return Math.random().toString(36).substring(2, 8);
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Could not find user" }, { status: 401 });
     }
 
-    if (currentUser.email != "kristians.sin.konto@gmail.com") {
+    if (currentUser.email !== env.ADMIN_EMAIL) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
