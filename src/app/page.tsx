@@ -65,6 +65,9 @@ export default function HomePage() {
         <Link href="/create/paragraph">
           <Button variant="default">Opprett en ny paragraf</Button>
         </Link>
+        <Link href="/paragraph/edit">
+          <Button variant="default">Rediger paragrafer</Button>
+        </Link>
       </div>
     </main>
   );
