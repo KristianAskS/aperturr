@@ -13,7 +13,6 @@ export default function CreateParagraph() {
 
   const [paragraphName, setParagraphName] = useState("");
   const [paragraphDescription, setParagraphDescription] = useState("");
-  // Changed maxFines state to string so it can be empty initially
   const [maxFines, setMaxFines] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [successMessage, setSuccessMessage] = useState("");

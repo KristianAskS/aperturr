@@ -35,17 +35,14 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    // Clerk auth
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    // Parse body
     const body = await req.json();
     const { offenderClerkId, description, fines, paragraphId, imageUrl } = body;
 
-    // Basic validation
     if (!offenderClerkId || !description || !fines || !paragraphId) {
       return NextResponse.json({ message: "Missing required fields." }, { status: 400 });
     }
@@ -54,7 +51,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Description is too long." }, { status: 400 });
     }
 
-    // Lookup the offender user
     const [offenderUserModel] = await db
       .select()
       .from(user)
@@ -65,7 +61,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Offender user not found." }, { status: 404 });
     }
 
-    // Lookup the issuer user (the currently authenticated Clerk user)
     const [issuerUserModel] = await db
       .select()
       .from(user)
@@ -76,7 +71,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Issuer user not found." }, { status: 404 });
     }
 
-    // Lookup the paragraph
     const [paragraphModel] = await db
       .select()
       .from(paragraph)
@@ -87,7 +81,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Paragraph not found." }, { status: 404 });
     }
 
-    // Insert the new fine
     await db.insert(fine).values({
       paragraphTitle: paragraphModel.title,
       paragraphShortId: paragraphModel.shortId,
@@ -97,7 +90,6 @@ export async function POST(req: Request) {
       offenderClerkId: offenderUserModel.clerkUserId,
       offenderName: offenderUserModel.username,
       issuerName: issuerUserModel.username,
-      // approved, reimbursed, and date are handled by defaults in schema
     });
 
     return NextResponse.json({ message: "Fine created successfully." }, { status: 201 });
