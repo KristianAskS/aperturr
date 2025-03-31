@@ -31,20 +31,18 @@ export default function FineList({ fines }: { fines: FineType[] }) {
     );
   }, [fines]);
 
-  // Group fines by offender
-// Group fines by offender
-const finesByOffender = React.useMemo(() => {
-  const grouped: Record<string, FineType[]> = {};
-  for (const fine of sortedFines) {
-    if (!fine.offenderName) continue;
-    const offender = fine.offenderName; // Now we know it's defined
-    if (!grouped[offender]) {
-      grouped[offender] = [];
+  const finesByOffender = React.useMemo(() => {
+    const grouped: Record<string, FineType[]> = {};
+    for (const fine of sortedFines) {
+      if (!fine.offenderName) continue;
+      const offender = fine.offenderName;
+      if (!grouped[offender]) {
+        grouped[offender] = [];
+      }
+      grouped[offender].push(fine);
     }
-    grouped[offender].push(fine);
-  }
-  return grouped;
-}, [sortedFines]);
+    return grouped;
+  }, [sortedFines]);
 
   return (
     <div className="mx-auto w-full max-w-xl p-4">
