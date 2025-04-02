@@ -69,6 +69,9 @@ export default function HomePage() {
           <Button variant="default">Rediger paragrafer</Button>
         </Link>
       </div>
+      <Link href="/fine/create" className="fixed bottom-4 right-4 text-3xl ">
+        +
+      </Link>
     </main>
   );
 }
