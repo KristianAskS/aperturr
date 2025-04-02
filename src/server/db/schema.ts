@@ -55,3 +55,11 @@ export const fine = createTable("fine", {
 export type ParagraphType = typeof paragraph.$inferSelect;
 
 export type ParagraphInsertType = typeof paragraph.$inferInsert;
+
+export type FineType = typeof fine.$inferSelect;
+
+export type FineInsertType = typeof fine.$inferInsert;
+
+export type UserType = typeof user.$inferSelect;
+
+export type UserInsertType = typeof user.$inferInsert;

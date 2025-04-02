@@ -8,13 +8,22 @@ import { fine, user, paragraph } from "~/server/db/schema";
 import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
+import { useAuth } from "@clerk/nextjs";
 
 export async function GET(req: Request) {
+  const { userId } = await auth();
+  if (!userId) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+
+
+
   const { searchParams } = new URL(req.url);
   const offset = searchParams.get("offset")
     ? parseInt(searchParams.get("offset") as string, 10)
     : 0;
-  const limit = 50;
+
+  const limit = searchParams.get("limit")
+    ? parseInt(searchParams.get("limit") as string, 10)
+    : 50;
 
   try {
     const fines = await db
