@@ -127,7 +127,7 @@ export default function EditParagraph() {
       
       <div className="mb-4">
         <Label htmlFor="paragraphSelect" className="mb-1">
-          Select Paragraph to Edit
+          Velg paragraf å redigere
         </Label>
         <select
           id="paragraphSelect"
@@ -145,15 +145,15 @@ export default function EditParagraph() {
 
       {selectedParagraph && (
         <div className="mb-4 p-4 border rounded">
-          <h2 className="text-xl font-semibold mb-2">Current Paragraph Preview</h2>
+          <h2 className="text-xl font-semibold mb-2">Gjeldende paragraf</h2>
           <p>
-            <strong>Title:</strong> {selectedParagraph.title}
+            <strong>Tittel:</strong> {selectedParagraph.title}
           </p>
           <p>
-            <strong>Description:</strong> {selectedParagraph.description}
+            <strong>Beskrivelse:</strong> {selectedParagraph.description}
           </p>
           <p>
-            <strong>Max Fines:</strong> {selectedParagraph.maxFines}
+            <strong>Maks antall bøter:</strong> {selectedParagraph.maxFines}
           </p>
         </div>
       )}
@@ -161,46 +161,46 @@ export default function EditParagraph() {
       <form onSubmit={handleParagraphUpdateSubmit} className="space-y-4">
         <div>
           <Label htmlFor="paragraphName" className="mb-1">
-            Paragraph Name
+            Paragrafnavn
           </Label>
           <Input
             id="paragraphName"
             type="text"
             value={paragraphName}
             onChange={(e) => setParagraphName(e.target.value)}
-            placeholder="Enter paragraph name"
+            placeholder="Skriv paragrafnavn"
             required
           />
         </div>
         <div>
           <Label htmlFor="paragraphDescription" className="mb-1">
-            Description
+            Beskrivelse
           </Label>
           <Textarea
             id="paragraphDescription"
             value={paragraphDescription}
             onChange={(e) => setParagraphDescription(e.target.value)}
-            placeholder="Enter description"
+            placeholder="Skriv beskrivelse"
             required
             className="h-24"
           />
         </div>
         <div>
           <Label htmlFor="maxFines" className="mb-1">
-            Max Fines
+            Maks antall bøter
           </Label>
           <Input
             id="maxFines"
             type="number"
             value={maxFines}
             onChange={(e) => setMaxFines(e.target.value)}
-            placeholder="Enter max fines"
+            placeholder="Skriv maks antall bøter"
             required
             className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
           />
         </div>
         <Button type="submit" className="w-full">
-          Update Paragraph
+          Oppdater paragraf
         </Button>
       </form>
     </div>

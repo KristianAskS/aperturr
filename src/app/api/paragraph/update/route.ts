@@ -8,7 +8,11 @@ import { eq } from "drizzle-orm";
 import { env } from "~/env";
 
 const fetchCurrentUser = async (userId: string) => {
-  const [currentUser] = await db.select().from(user).where(eq(user.clerkUserId, userId));
+  const [currentUser] = await db
+    .select()
+    .from(user)
+    .where(eq(user.clerkUserId, userId));
+
   if (!currentUser) {
     throw new Error("Could not find user");
   }
@@ -37,6 +41,7 @@ export async function POST(req: Request) {
       .select()
       .from(paragraph)
       .where(eq(paragraph.shortId, shortId));
+    
     if (!paragraphModel) {
       return NextResponse.json({ message: "Paragraph not found." }, { status: 404 });
     }

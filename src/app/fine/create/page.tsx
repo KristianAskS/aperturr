@@ -12,7 +12,7 @@ import { CreateFineForm } from "~/components/create-fine-form";
 import ParagraphList from "~/components/paragraph-list";
 import { ParagraphType } from "~/server/db/schema";
 
-export default function Create() {
+export default function CreateParagraph() {
   const { userId } = useAuth();
   const [paragraphs, setParagraphs] = useState<ParagraphType[]>([]);
   const [clerkIdUsernamePairs, setClerkIdUsernamePairs] = useState<[string, string][]>([]);

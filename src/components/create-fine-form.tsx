@@ -94,7 +94,8 @@ export function CreateFineForm({
         });
         const uploadedFile = response[0];
         if (uploadedFile) {
-          formData.imageUrl = uploadedFile.url;
+          // changed from url to ufsUrl
+          formData.imageUrl = uploadedFile.ufsUrl;
         }
       } catch (err) {
         console.error("UploadThing error:", err);
@@ -218,7 +219,7 @@ export function CreateFineForm({
 
         <div>
           <Label htmlFor="image" className="mb-2 block">
-            Bilde (valgfri)
+            Bilde (Valgfritt)
           </Label>
           <div className="flex items-center space-x-4">
             <Input
