@@ -121,7 +121,7 @@ export default function EditParagraph() {
       <Link href="/" className="text-blue-500 hover:underline mb-4 block">
         Back
       </Link>
-      <h1 className="text-4xl font-bold mb-4">Edit Paragraph</h1>
+      <h1 className="text-4xl font-bold mb-4">Rediger Paragraph</h1>
       {successMessage && <p className="text-green-500 mb-4">{successMessage}</p>}
       {errorMessage && <p className="text-red-500 mb-4">{errorMessage}</p>}
       
