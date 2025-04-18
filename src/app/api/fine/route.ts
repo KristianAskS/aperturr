@@ -12,10 +12,32 @@ import { useAuth } from "@clerk/nextjs";
 
 export async function GET(req: Request) {
   const { userId } = await auth();
-  if (!userId) return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
   const { searchParams } = new URL(req.url);
+  const idParam = searchParams.get("id");
+
+  if (idParam) {
+    try {
+      const id = parseInt(idParam, 10);
+      const [fineResult] = await db
+        .select()
+        .from(fine)
+        .where(eq(fine.id, id))
+        .limit(1);
+
+      return NextResponse.json(fineResult, { status: 200 });
+    } catch (error) {
+      console.error("Error fetching fine by id:", error);
+      return NextResponse.json(
+        { message: "Internal server error.", error: (error as Error).message },
+        { status: 500 }
+      );
+    }
+  }
+
   const offset = searchParams.get("offset")
     ? parseInt(searchParams.get("offset") as string, 10)
     : 0;
