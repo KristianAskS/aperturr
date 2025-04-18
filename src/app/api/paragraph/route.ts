@@ -11,6 +11,17 @@ import { auth } from "@clerk/nextjs/server";
 import { user } from "~/server/db/schema";
 import { env } from "~/env";
 
+import { resend } from "~/server/rs";
+
+
+const fetchAllEmails = async () => {
+  const users: { email: string }[] = await db.select({ email: user.email }).from(user);
+  if (!users) {
+    return [];
+  }
+  return users.map((user) => user.email);
+}
+
 const generateShortId = () => {
   return Math.random().toString(36).substring(2, 8);
 };
@@ -59,7 +70,25 @@ export async function POST(req: Request) {
       description,
       maxFines,
       shortId: shortId,
-    })
+    });
+
+    const allEmails = await fetchAllEmails();
+    try {
+      await resend.emails.send({
+        from: `Aperturr <${env.RESEND_SENDER_EMAIL}>`,
+        to: allEmails,
+        subject: "Nytt paragraf i Aperturr",
+        html: `
+          <p>Hei,</p>
+          <p>En ny paragraf har trådt i kraft hos Aperturr:</p>
+          <p><strong>${title}</strong></p>
+          <p>${description}</p>
+          <p>Hilsen Aperturr-systemet.</p>
+        `,
+      });
+    } catch (emailError) {
+      console.error("Error sending paragraph notification email:", emailError);
+    }
 
     return NextResponse.json({ message: "Paragraph created successfully." }, { status: 201 });
   } catch (error) {

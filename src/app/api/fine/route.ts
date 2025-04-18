@@ -8,9 +8,7 @@ import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import { env } from "~/env";
-
-import { Resend } from "resend";
-const resend = new Resend(env.RESEND_TOKEN);
+import { resend } from "~/server/rs";
 
 export async function GET(req: Request) {
   const { userId } = await auth();
