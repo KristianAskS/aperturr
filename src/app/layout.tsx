@@ -38,14 +38,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <ClerkProvider>
       <html lang="en" className={GeistSans.variable}>
-        <body className="relative min-h-screen bg-white dark:bg-neutral-950 overflow-hidden">
+        <body className="relative min-h-screen bg-white dark:bg-neutral-950 overflow-x-hidden">
           <RootStripes />
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
             <div className="relative z-10 flex flex-col min-h-screen">
             <header className="flex justify-end items-center p-4 gap-4 h-16 bg-white dark:bg-neutral-950 z-50">
                 <SignedOut>
                   <SignInButton />
-                  <SignUpButton />
                 </SignedOut>
                 <SignedIn>
                   <UserButton />
