@@ -1,14 +1,16 @@
+/* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/non-nullable-type-assertion-style */
-
 import { NextResponse } from "next/server";
 import { fine, user, paragraph } from "~/server/db/schema";
 import { db } from "~/server/db";
 import { eq } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
-import { useAuth } from "@clerk/nextjs";
+import { env } from "~/env";
+
+import { Resend } from "resend";
+const resend = new Resend(env.RESEND_TOKEN);
 
 export async function GET(req: Request) {
   const { userId } = await auth();
@@ -114,7 +116,7 @@ export async function POST(req: Request) {
     await db.insert(fine).values({
       paragraphTitle: paragraphModel.title,
       paragraphShortId: paragraphModel.shortId,
-      description: description,
+      description,
       numFines: Number(fines),
       imageLink: imageUrl ?? null,
       offenderClerkId: offenderUserModel.clerkUserId,
@@ -122,7 +124,25 @@ export async function POST(req: Request) {
       issuerName: issuerUserModel.username,
     });
 
-    return NextResponse.json({ message: "Fine created successfully." }, { status: 201 });
+    try {
+      await resend.emails.send({
+        from: `Aperturr <${env.RESEND_SENDER_EMAIL}>`,
+        to: [offenderUserModel.email],
+        subject: `Ny bot fra Aperturr`,
+        html: `
+          <p>Heisann, ${offenderUserModel.username},</p>
+          <p>Du har blitt ilagt en bot under paragraf <strong>${paragraphModel.title}</strong>
+          <p><strong>Beskrivelse:</strong> ${description}</p>
+          <p><strong>Antall bøter:</strong> ${fines}</p>
+          <p>Vedkommende som meldte boten: ${issuerUserModel.username}.</p>
+          ${imageUrl ? `<p><strong>Bildebevis:</strong> <a href="${imageUrl}">Se bildet</a></p>` : ""}
+        `,
+      });
+    } catch (emailError) {
+      console.error("Error sending notification email:", emailError);
+    }
+
+    return NextResponse.json({ message: "Fine created and notification sent." }, { status: 201 });
   } catch (error) {
     console.error("Error creating fine:", error);
     return NextResponse.json(
